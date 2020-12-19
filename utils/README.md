@@ -27,13 +27,15 @@
     
 - 支持的数据增广
     - 基础数据增广,颜色方面（调节对比度，调节亮度，调节Hue，添加饱和度，添加高斯噪声等
+    - 随机旋转
     - 随机缩放
     - 翻转
     - CutMix
     - Cutout
     - GridMask
     - MixUp
-    - RandomErasing
+    - RandomErasing: 随机擦除
+    - random_zoom: 随机缩放, 居中裁剪
     
     
     

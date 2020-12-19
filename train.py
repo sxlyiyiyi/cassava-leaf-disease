@@ -1,13 +1,10 @@
 import tensorflow as tf
-from absl import app, flags, logging
-from absl.flags import FLAGS
 from utils.data_aug import get_dataset
 from utils.util import config_optimizer, learning_rate_config, add_regularization
 from utils.util import ckpt_manager, set_device
 from utils.logger import create_logger
 from utils.score import ClassMetric
 from tqdm import tqdm
-from models.model_sum import get_model
 from utils.loss import get_loss
 from utils.visualization import show_image
 from models.model_sum import get_model
