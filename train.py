@@ -29,7 +29,6 @@ def train():
     # for batch, (images, labels) in enumerate(train_dataset):
     #     for i in range(cfg.TRAIN.BATCH_SIZE):
     #         show_image(images[i], labels[i], cfg.DATASET.LABELS)
-    # endregion
 
     # 构建模型与损失函数
     model = get_model(cfg.MODEL_NAME, cfg)

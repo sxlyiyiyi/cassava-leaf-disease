@@ -1,20 +1,16 @@
 import tensorflow as tf
-from absl import logging, flags, app
-from absl.flags import FLAGS
 import numpy as np
 
 from absl.flags import FLAGS
 from utils.imaug.GridMask import gridmask
 from utils.imaug.CutMix import cutmix
-from utils.imaug.geometry import random_zoom
 from utils.imaug.colorjitter import adjust_color
-from utils.imaug.Cutout import cutout
+from utils.imaug.Cutout import random_cutout
 from utils.imaug.RnadomErasing import random_erasing
 from utils.imaug.Mixup import mixup
 from utils.imaug.RandomFlip import random_flip
-
-flags.DEFINE_integer('num_train_pic', 1732, '训练集图片数')
-flags.DEFINE_integer('num_val_pic', 300, '验证集集图片数')
+from utils.imaug.Rotate import random_rotate, rot90
+from utils.imaug.Resize import StepScaleCrop, random_resizedcrop, random_zoom
 
 
 # tfrecord格式转换
@@ -45,16 +41,20 @@ def get_dataset(file, cfg, is_training=False):
     dataset = dataset.map(lambda x: _parse_tfrecord(x, cfg))
 
     if is_training:
-        dataset = dataset.shuffle(buffer_size=300)
-        # dataset = dataset.map(adjust_color)
-        # dataset = dataset.map(lambda x, y: random_flip(x, y, vertical=False))
-        # dataset = dataset.map(random_zoom)
-        # dataset = dataset.map(gridmask)
-        # dataset = dataset.map(lambda x, y: random_erasing(x, y, probability=0.5, sl=0.02, sh=0.3, r1=0.3))
+        # dataset = dataset.shuffle(buffer_size=300)
+        dataset = dataset.map(adjust_color)
+        dataset = dataset.map(lambda x, y: random_flip(x, y, vertical=True))
+        dataset = dataset.map(rot90)
+        dataset = dataset.map(lambda x, y: random_rotate(x, y, rotation=np.math.pi / 8))
+        # dataset = dataset.map(lambda x, y: random_zoom(x, y, dl=0.75, ul=1.5))
+        # dataset = dataset.map(lambda x, y: gridmask(x, y, d1=80, d2=150, rotate=20, ratio=0.1))
+        # dataset = dataset.map(lambda x, y: StepScaleCrop(x, y, size=cfg.DATASET.SIZE, dl=0.7, ul=1.3, step_size=0.1))
+        # dataset = dataset.map(lambda x, y: random_resizedcrop(x, y, size=cfg.DATASET.SIZE, dl=0.7, ul=1.3))
+        # dataset = dataset.map(lambda x, y: random_erasing(x, y, probability=0.5, sl=0.02, sh=0.1, r1=0.5))
         dataset = dataset.batch(cfg.TRAIN.BATCH_SIZE)
-        # dataset = dataset.map(lambda x, y: cutmix(x, y, batch_size, classes))
-        # dataset = dataset.map(lambda x, y: mixup(x, y, batch_size, classes, probability=0.5))
-        # dataset = dataset.map(lambda x, y: cutout(x, y, mask_size=80))
+        # dataset = dataset.map(lambda x, y: cutmix(x, y, cfg.TRAIN.BATCH_SIZE, cfg.DATASET.N_CLASSES))
+        # dataset = dataset.map(lambda x, y: mixup(x, y, cfg.TRAIN.BATCH_SIZE, cfg.DATASET.N_CLASSES, probability=0.5))
+        # dataset = dataset.map(lambda x, y: random_cutout(x, y, mask_size=80))
     else:
         dataset = dataset.batch(1)
     dataset = dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)

@@ -46,11 +46,11 @@ def random_erasing(img, label, probability=0.5, sl=0.02, sh=0.4, r1=0.3, method=
     part1 = tf.slice(img, [0, 0, 0], [x1, img_width, img_channels])  # first row
     part2 = tf.slice(img, [x1, 0, 0], [h, y1, img_channels])  # second row 1
 
-    if method is 'black':
+    if method == 'black':
         part3 = tf.zeros((h, w, img_channels), dtype=tf.float32)  # second row 2
-    elif method is 'white':
+    elif method == 'white':
         part3 = tf.ones((h, w, img_channels), dtype=tf.float32)
-    elif method is 'random':
+    elif method == 'random':
         part3 = tf.random.uniform((h, w, img_channels), dtype=tf.float32)
     else:
         raise print('Wrong method parameter')
